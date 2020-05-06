@@ -1,4 +1,3 @@
-  size(1000, 500);
 drawCar = function(posX, posY, width, height){
    rect(posX, posY, width, height);
    rect(posX - width/6, posY + height*4/7, width*4/3, height*3/7);
@@ -10,15 +9,18 @@ drawStone = function(posX, posY, width, height){
     ellipse(posX, posY, width, height);
 }
 run = function(car){
+  // if collision is false then run
   if(!car[4]){
     car[0] += random(0, 8);
-    car[1] += random(-8, 8);
-    if(car[1] <= 20 ){
+    car[1] += random(-6, 6);
+    //let cars in right land
+    if(car[1] <= sizeHeight/4 ){
       car[1] += random(0, 10);
-    } else if (car[1] >= 450){
+    } else if (car[1] >= sizeHeight*3/4){
       car[1] += random(-10, 0);
     }
-    if(car[0] + car[2] >= 1000){
+    // stop draw if a car run to the finish line
+    if(car[0] + car[2] >= sizeWidth){
       println("End!!!!");
       noLoop();
     }
@@ -27,12 +29,14 @@ run = function(car){
 
 objSpace = function(posX, posY, width, height){
   return [posX, posX+width, posY, posY+height]
+  // return [left, right, top, bottom]
 }
 
 isCollision = function(firstObj, secondObj){
   const first = objSpace(...firstObj);
   const second = objSpace(...secondObj); 
 
+  // size first object < size seccond obj
   if(first[0] >second[0] && first[0] < second[1]){
     if(first[2] > second[2] && first[2] < second[3]){
       return true
@@ -57,7 +61,7 @@ isCollision = function(firstObj, secondObj){
     }
   }
 
-  //
+  // size first object > size seccond obj
 
   if(second[0] > first[0] && second[0] < first[1]){
     if(second[2] > first[2] && second[2] < first[3]){
@@ -82,9 +86,16 @@ isCollision = function(firstObj, secondObj){
     return true
     }
   }
+
+  // size first object = size seccond obj
+  if(first[2] === second[2] && first[1] === second[1] && first[3] === second[3]){
+  return true;
+  }
+  return false;
 }
 
 checkCollision = function(listObj){
+  // check objects is collision or not 
   for(let i = 0; i<listObj.length-1; i++){
     for(let j = i +1; j < listObj.length; j++){
       if(isCollision(listObj[i], listObj[j])){
@@ -95,21 +106,53 @@ checkCollision = function(listObj){
   }
 }
 createCar = function(){
-  return [random(50, 150), random(50, 450), random(50, 80), random(50, 80), false];
+  let x = random(sizeHeight/13, sizeHeight*5/13);
+  let y = random(sizeWidth*4/25, sizeWidth/3);
+  let width = random(sizeWidth/30, sizeWidth/40);
+  let height = random(sizeWidth/30, sizeWidth/40);
+  return [x, y, width, height , false];
 }
 createStone = function(){
- return [random(300,900), random(50, 450), random(30,60), random(30,60), true];
-
+  let x = random(sizeWidth/6, sizeWidth*11/12);
+  let y = random(sizeHeight/3, sizeHeight*5/6);
+  let width = random(sizeWidth/60, sizeWidth/24);
+  let height = random(sizeWidth/60, sizeWidth/24);
+  return [x, y, width, height, true];
 }
+decorate = function(){
+  background(150,150,150);
+  noStroke();
+  //grass
+  fill(0, 255, 0);
+  rect(0, sizeHeight*5/6, sizeWidth, sizeHeight/6);
+  //sky
+  fill(120,120,255);
+  rect(0, 0, sizeWidth, sizeHeight/4);
+  // cloud
+  fill(255,255,255);
+  ellipse(sizeWidth/12, sizeHeight/6, sizeWidth/12, sizeHeight/12);
+  ellipse(sizeWidth/12, sizeHeight*2/15, sizeWidth/24, sizeHeight/12);
+  ellipse(sizeWidth/3, sizeHeight/6, sizeWidth/12, sizeHeight/12);
+  ellipse(sizeWidth/3, sizeHeight*2/15, sizeWidth/24, sizeHeight/12);
+  ellipse(sizeWidth*7/12, sizeHeight/6, sizeWidth/12, sizeHeight/12);
+  ellipse(sizeWidth*7/12, sizeHeight*2/15, sizeWidth/24, sizeHeight/12);
+  ellipse(sizeWidth*5/6, sizeHeight/6, sizeWidth/12, sizeHeight/12);
+  ellipse(sizeWidth*5/6, sizeHeight*2/15, sizeWidth/24, sizeHeight/12);
+}
+
+const sizeHeight = 600;
+const sizeWidth = 1200;
 const carA = createCar();
 const carB = createCar();
 const carC = createCar();
 const stoneA = createStone();
 const stoneB = createStone();
-const stoneC = createStone();
-const listObj =[carA, carB, carC, stoneA, stoneB, stoneC];
+const listObj =[carA, carB, carC, stoneA, stoneB];
+setup = function(){
+  size(sizeWidth, sizeHeight);
+}
 draw = function() {
-  background(150,150,150);
+  decorate();
 
   drawCar(...carA, fill(255, 50, 50));
   drawCar(...carB, fill(50, 255, 50));
@@ -117,7 +160,6 @@ draw = function() {
 
   drawStone(...stoneB);
   drawStone(...stoneA);
-  drawStone(...stoneC);
 
   run(carA);
   run(carB);
@@ -125,5 +167,4 @@ draw = function() {
 
   checkCollision(listObj);
 };
-
 
